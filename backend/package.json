@@ -1,0 +1,21 @@
+{
+  "name": "workadesq-api",
+  "version": "1.0.0",
+  "description": "api for the vue pwa frontend",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "author": "Percy Helsdon",
+  "license": "ISC",
+  "dependencies": {
+    "ckey": "^1.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.2",
+    "express": "^4.18.1",
+    "mongoose": "^6.6.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}

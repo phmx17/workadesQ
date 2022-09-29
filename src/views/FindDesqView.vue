@@ -5,15 +5,6 @@
         <h4>user: {{ center.lat }} | {{ center.lng }}</h4>
         <h4>map: {{ mapCoordinates.lat }} | {{ mapCoordinates.lng }}</h4>
       </div>
-      <h4>Search and add a pin</h4>
-      <div>
-        <gmap-autocomplete
-          @place_changed="setPlace"
-          :options="{fields: ['geometry', 'formatted_address', 'address_components']}">
-        </gmap-autocomplete>
-        <button @click="addMarker">Add Marker</button>
-      </div>
-      <br/>
 
     </div>
     <br>

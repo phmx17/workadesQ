@@ -32,6 +32,7 @@
         <v-text-field 
           label="Name for WorkAdesq"
           hide-details="auto"
+          v-model="deskName"
         ></v-text-field>
       </v-col>
     </v-row>
@@ -92,7 +93,7 @@
     </v-row>
     <!-- overlay -->
     <v-overlay :value="submitOverlay" @click="submitOverlay = false">
-      <h2>Thank You for submitting to WorkAdesq</h2> 
+      <h2>Thank You for submitting to workadesQ</h2> 
     </v-overlay>
   </v-col>
   </v-row>
@@ -102,22 +103,24 @@
 </template>
 
 <script>
+import { desksApiCaller } from '../utils/desksApiCaller.js'
 export default {
   data() {
     return {
-      center: { lat: 45.508, lng: -73.587 }, // same as user coordinates
+      center: { lat: 45.508, lng: -73.587 }, // placeholder for user coords
       markers: [],
       places: [],
       currentPlace: "",
-      weekdayHours: [6, 18],
-      weekendHours: [6, 18],
-      min: 0,
-      max: 24,
-      rating: 3,
-      // amenities
+      deskName: "",
+      formattedAddress:"",
+      // features
       features: {
         desk: false, wifi: false, power: false, coffee: false, wc: false
       },
+      weekdayHours: [6, 18], // pre-popuated - looks kewl
+      weekendHours: [6, 18],
+      min: 0, // limits on the slider from 0 to 24:00 hours
+      max: 24,
       daysClosed: [
         {day: "mon",closed: false},
         {day: "tue",closed: false},
@@ -127,6 +130,7 @@ export default {
         {day: "sat",closed: false},
         {day: "sun",closed: false},
       ],
+      rating: 3,
       submitOverlay: false,
     };
   },
@@ -138,12 +142,29 @@ export default {
         lng: place.geometry.location.lng(),
       };
       this.center = marker;
+      this.formattedAddress = place.formatted_address
       this.currentPlace = place;  
     },
 
     handleSubmit() {
       this.submitOverlay = true
-      // API call here, refactor to an external module!
+      // prepare data for shipment
+      const data = {
+        name: this.deskName,
+        features: this.features,
+        weekdayHours: this.weekdayHours,
+        weekendHours: this.weekendHours,
+        location: {
+          type: 'Point',
+          coordinates: [this.center.lat, this.center.lng],
+          formattedAddress: this.formattedAddress
+        },
+        daysClosed: this.daysClosed,
+        rating: this.rating
+      }    
+      // call custom api caller which uses axios  
+      const reply = desksApiCaller('post', data)
+      console.log("reply from desk vue: ", reply)
     } 
 
   },
