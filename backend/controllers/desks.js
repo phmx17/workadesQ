@@ -20,7 +20,7 @@ const getDesks = async(req, res) => {
 const postDesk = async(req, res) => {
 	const newDesk = req.body
 	try {
-		const createdDesk = await Desk.create(newDesk)	// only returns success
+		const createdDesk = await Desk.create(newDesk)	// only returns success, no error
 		const savedDesk = await createdDesk.save()
 		res.status(200).json({success: true, data: savedDesk })
 	} catch (err) {	// mostly validation errors caught

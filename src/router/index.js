@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import ValidateTests from '../views/ValidateTests.vue'
 
 Vue.use(VueRouter)
 
@@ -25,7 +24,13 @@ const routes = [
     path: '/validate',
     name: 'validate',
     component: () => import('../views/ValidateTests.vue') // lazy load
-  }
+  },
+  {
+  path: '/user/register',
+  name: 'userRegister',
+  component: () => import('../views/user/RegisterUserView.vue') // lazy load
+  },
+
 ]
 
 const router = new VueRouter({
