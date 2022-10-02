@@ -27,6 +27,7 @@
 </template>
 
 <script>
+import { desksApiCaller } from '../utils/desksApiCaller.js'
 export default { 
   data() {
     return {      
@@ -43,16 +44,30 @@ export default {
     };
   },
 
-  mounted() {
+  async mounted() {
     this.geolocate();
     this.$refs.mapRef.$mapPromise.then(map => this.map = map)
+    // populate map with markers
+    const desks = await desksApiCaller('get')
+    if (!desks.error) this.displayMarkers(desks) // get markers onto the map
+    else console.log("Error message inside vue: ", desks.error)
   },
 
   methods: {
+    displayMarkers(desks) {
+      // update markers list for showing on map
+      desks.forEach(desk => {
+        let marker = {} // required here, otherwise marker turns into an observer after markers.push
+        marker.lat = desk.location.coordinates[0]
+        marker.lng = desk.location.coordinates[1]
+        this.markers.push({ position: marker})
+      })
+    },
+
     setPlace(place) {
       this.currentPlace = place;
-      console.log("place: ", place)
     },
+
     addMarker() {
       if (this.currentPlace) {
         const marker = {
@@ -90,10 +105,10 @@ export default {
       // this.center.lng = this.map.getCenter().lng().toFixed(4),
       // this.zoomLevel = this.map.getZoom()
       const bounds = this.map.getBounds()
-      this.boundsLowLat = bounds.Ab.lo  // maybe convert to array later
-      this.boundsHiLat = bounds.Ab.hi
-      this.boundsLowLng = bounds.Va.lo
-      this.boundsHiLng = bounds.Va.hi
+      // this.boundsLowLat = bounds.Ab.lo  // maybe convert to array later
+      // this.boundsHiLat = bounds.Ab.hi
+      // this.boundsLowLng = bounds.Va.lo
+      // this.boundsHiLng = bounds.Va.hi
     },
 
     handleAddMarker() {

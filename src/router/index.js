@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import ValidateTests from '../views/ValidateTests.vue'
 
 Vue.use(VueRouter)
 
@@ -19,6 +20,11 @@ const routes = [
     path: '/adddesq',
     name: 'addDesq',
     component: () => import('../views/AddDesqView.vue') // lazy load
+  },
+  {
+    path: '/validate',
+    name: 'validate',
+    component: () => import('../views/ValidateTests.vue') // lazy load
   }
 ]
 

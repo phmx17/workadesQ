@@ -5,7 +5,13 @@ const Desk = require('../models/Desk.js')
 // @ route	GET /api/v1/desks
 // @ access public
 const getDesks = async(req, res) => {
-	res.send("")
+	try {
+		const allDesks = await Desk.find()
+		res.status(200).json({success: true, data: allDesks })
+	} catch (err) {
+		console.error("catch error message: ", err )
+		res.status(404).json({success: false, data: err})
+	}
 }
 
 // @ desc create new desk
@@ -40,3 +46,5 @@ const deleteDesk = async(req, res) => {
 module.exports = {
 	getDesks, postDesk, putDesk, deleteDesk
 }
+
+
