@@ -1,5 +1,6 @@
 // import models 
 const User = require('../models/User.js')
+const jwt = require()
 
 // @ desc register new User
 // @ route	POST /api/v1/auth
@@ -10,24 +11,24 @@ const registerUser = async(req, res) => {
 		const createdUser = await User.create(newUser)	// only returns success, no error
 		const savedUser = await createdUser.save()
 		res.status(200).json({success: true, data: savedUser })
-	} catch (err) {	// mostly validation errors caught
+	} catch (err) {	// mostly validation errors caught from User.create
 		console.error("catch error message: ", err )
 		return res.status(400).json({success: false, data: err.errors})
 	}	
 }
 
-// @ desc update user
-// @ route	PUT /api/v1/auth/:id
-// @ access private
+// @ desc login
+// @ route POST /api/v1/auth/:id
+// @ access public
 const updateUser = async(req, res) => {
-	res.send("put user controller")
+	res.send("logout")
 }
 
-// @ desc delete user
-// @ route	DELETE /api/v1/auth/:id
+// @ desc logout
+// @ route	POST /api/v1/auth/:id
 // @ access private
 const deleteUser= async(req, res) => {
-	res.send("delete User controller")
+	res.send("logout")
 }
 
 module.exports = {

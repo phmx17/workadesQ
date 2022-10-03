@@ -10,9 +10,11 @@ export const desksApiCaller = async(method, data) => {
 			}
 			try {            
 				const reply = await axios(optionsPost)
-				return reply.data
+				return 
 			} catch (err) { 
-				return {success: false, error: err}
+				const errKeyValue = err.response.data.data.keyValue
+				console.log("err", errKeyValue )
+				if (errKeyValue) return "This location already exists"
 			}
 		
 		

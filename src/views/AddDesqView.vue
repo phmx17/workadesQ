@@ -1,12 +1,12 @@
 <template>
-  <ValidationObserver v-slot="{ handleSubmit }">
+  <ValidationObserver ref="form" v-slot="{ handleSubmit }">
     <form @submit.prevent="handleSubmit(handleSubmitForm)">
       <v-app>
       <v-main>
       <v-container>
       <v-row>
       <v-col class="px-5 text-center">
-        <ValidationProvider :rules="{requiredLocation: true, min: 3, max: 30}" v-slot="{ errors }">
+        <ValidationProvider :rules="{requiredLocation: true, min: 3, max: 30}" v-slot="{ errors }" name="autocomplete" >
         <!-- places api  -->
         <v-input value="currentPlace">
           <gmap-autocomplete
@@ -163,7 +163,7 @@ export default {
   },
 
   methods: {
-    setPlace(place) {
+    setPlace(place) {      
       const marker = {
         lat: place.geometry.location.lat(),
         lng: place.geometry.location.lng(),
@@ -173,8 +173,8 @@ export default {
       this.currentPlace = place;  
     },
 
-    handleSubmitForm() {
-      this.submitOverlay = true
+    async handleSubmitForm() {
+      // insert saving spinner
       // prepare data for shipment
       const data = {
         name: this.deskName,
@@ -189,9 +189,16 @@ export default {
         daysClosed: this.daysClosed,
         rating: this.rating
       }    
-      // call custom api caller which uses axios  
-      // const reply = desksApiCaller('post', data)
-      console.log("reply from desk vue: ", reply)
+      this.$refs.form.validate().then(async success => {
+        if (!success) return
+        
+        const reply = await desksApiCaller('post', data)
+        if (reply === "This location already exists") {
+          this.$refs.form.setErrors({autocomplete: reply})
+          return
+        }
+        this.submitOverlay = true
+      })
     } 
 
   },

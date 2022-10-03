@@ -25,7 +25,10 @@ const postDesk = async(req, res) => {
 		res.status(200).json({success: true, data: savedDesk })
 	} catch (err) {	// mostly validation errors caught
 		console.error("catch error message: ", err )
-		return res.status(400).json({success: false, data: err.errors})
+		return res.status(400).json({success: false, data: {
+			code: err.code,
+			keyValue: err.keyValue
+		}})
 	}	
 }
 

@@ -15,8 +15,7 @@ const deskSchema = new mongoose.Schema({
 			type: [Number],
 			index: '2d-sphere'
 	  },
-	 	formattedAddress: {type: String, required: true, unique: true	
-	 	}
+	 	formattedAddress: {type: String, required: true, unique: [true, "needs to be unique"]}
 	},
 
   features: {

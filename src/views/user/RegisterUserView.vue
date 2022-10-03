@@ -4,17 +4,17 @@
       <v-row justify="center" >
         <v-col class="center-text">
           <h1>Register</h1>
-          <ValidationObserver v-slot="{ handleSubmit }">
-            <v-form @submit.prevent="handleSubmit(handleSubmitForm)">    
-              <ValidationProvider mode="passive" :rules="{regex: /^[a-zA-Z0-9#@&!$ ]*$/, requiredUserName: true, min: 3, max: 30}" v-slot="{ errors }">      
-                <v-text-field v-model="username" clearable label="username"></v-text-field>
+          <ValidationObserver ref="form">
+            <v-form @submit.prevent="handleSubmitForm">    
+              <ValidationProvider :rules="{regex: /^[a-zA-Z0-9#@&!$ ]*$/, requiredUserName: true, min: 3, max: 30}" v-slot="{ errors }" name="username">      
+                <v-text-field v-model="username" clearable label="username" @blur="handleValidateUsername" ></v-text-field>
                 <span>{{ errors[0] }}</span>
               </ValidationProvider>
-              <ValidationProvider mode="passive" :rules="{email: true, requiredEmail: true, max: 30}" v-slot="{ errors }">
-                <v-text-field v-model="email" clearable label="email"></v-text-field>
+              <ValidationProvider :rules="{email: true, requiredEmail: true, max: 30}" v-slot="{ errors }" name="email">
+                <v-text-field v-model="email" clearable label="email" @blur="handleValidateEmail" ></v-text-field>
                 <span>{{ errors[0] }}</span>
               </ValidationProvider>
-              <ValidationProvider mode="passive" rules="confirmed:confirmPassword|min:6|max:15|requiredPassword" v-slot="{ errors }"><!-- must use pipe operator with confirmed -->
+              <ValidationProvider mode="passive" rules="confirmed:confirmPassword|min:3|max:15|requiredPassword" v-slot="{ errors }"><!-- must use pipe operator with confirmed -->
                 <v-text-field v-model="password" clearable label="password"></v-text-field>
                 <span>{{  errors[0] }}</span>
               </ValidationProvider>
@@ -51,7 +51,8 @@ extend('confirmed', {...confirmed, message: "Passwords must match" })
 // setInteractionMode('passive');
 
 // custom api caller
-import { authApiCaller } from '../../utils/authApiCaller.js'
+import { usersApiCaller } from '../../utils/usersApiCaller.js'
+import { registerApiValidate } from '../../utils/registerApiValidate.js'
 
 export default {
   components: {
@@ -59,33 +60,52 @@ export default {
   },
   data() {
     return {
-      username: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
+      username: "slim yelow",
+      email: "slimyelow@gmail.com",
+      password: "qwer",
+      confirmPassword: "qwer",
       submitOverlay: false,
 
     }
   },
   methods: {
-    handleSubmitForm() {
+    async handleValidateUsername() {
+      const reply = await registerApiValidate('username', this.username)
+      if (reply) this.$refs.form.setErrors({username: "Username has already been taken"})     
+    },
+    
+    async handleValidateEmail() {
+      const reply = await registerApiValidate('email', this.email)
+      if (reply) if (reply) this.$refs.form.setErrors({email: "Email is already in use"})     
+    },
+
+    async handleSubmitForm() {
       // insert spinner while api submits and checks for duplicate location
-
       // prepare data for shipment
-      const data = {
-        username: this.username,
-        email: this.email,
-        password: this.password
-      }    
-      // call custom api caller which uses axios  
-      const reply = authApiCaller('post', data)
+      let data = {
+      username: this.username,
+      email: this.email,
+      password: this.password
+      }
+      this.$refs.form.validate().then(async success => {
+        if (!success) return
 
-      console.log("reply from desk vue: ", reply)
-
-      this.submitOverlay = true
+        const reply = await usersApiCaller('post', data)
+        if (reply === "username has already been taken") {
+          this.$refs.form.setErrors({username: reply})
+          return
+        }
+        if (reply === "email is already in use") {
+          this.$refs.form.setErrors({email: reply})
+          return
+        }
+        this.submitOverlay = true
+      })
+      
     }
   }
 }
+
 </script>
 
 <style scoped>
