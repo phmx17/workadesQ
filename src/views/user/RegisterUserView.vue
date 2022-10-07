@@ -48,7 +48,6 @@ extend('requiredPassword', {...required, message: "Password is required" })
 extend('regex', {...regex, message: "Special Characters allowed: # @ & ! $" })
 extend('email', {...email, message: "Incorrect email format" })
 extend('confirmed', {...confirmed, message: "Passwords must match" })
-// setInteractionMode('passive');
 
 // custom api caller
 import { usersApiCaller } from '../../utils/usersApiCaller.js'
@@ -73,7 +72,7 @@ export default {
       const reply = await registerApiValidate('username', this.username)
       if (reply) this.$refs.form.setErrors({username: "Username has already been taken"})     
     },
-    
+
     async handleValidateEmail() {
       const reply = await registerApiValidate('email', this.email)
       if (reply) if (reply) this.$refs.form.setErrors({email: "Email is already in use"})     
@@ -100,6 +99,7 @@ export default {
           return
         }
         this.submitOverlay = true
+        this.$router.push('/login')
       })
       
     }

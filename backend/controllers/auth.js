@@ -1,36 +1,36 @@
-// import models 
+const signJwt = require('../utils/signJwt')
 const User = require('../models/User.js')
-const jwt = require()
+const comparePasswords = require('../utils/compare.js')
 
-// @ desc register new User
-// @ route	POST /api/v1/auth
-// @ access public
-const registerUser = async(req, res) => {
-	const newUser = req.body
-	try {
-		const createdUser = await User.create(newUser)	// only returns success, no error
-		const savedUser = await createdUser.save()
-		res.status(200).json({success: true, data: savedUser })
-	} catch (err) {	// mostly validation errors caught from User.create
-		console.error("catch error message: ", err )
-		return res.status(400).json({success: false, data: err.errors})
-	}	
-}
 
 // @ desc login
-// @ route POST /api/v1/auth/:id
+// @ route	POST /api/v1/auth/login
 // @ access public
-const updateUser = async(req, res) => {
-	res.send("logout")
+const login = async(req, res) => {
+	const userLogin = req.body
+	try {
+		const foundUser = await User.find({email: userLogin.email})	// returns an array!	
+		if (foundUser.length <= 0) return res.status(404).json({success: false, errMsg: "Invalid credentials"})
+
+		const passwordMatch = await comparePasswords(userLogin.password, foundUser[0].password)
+		if (!passwordMatch) return res.status(404).json({success: false, errMsg: "Invalid credentials"})
+
+		// login success, sign jwt
+		const jwt = await signJwt({username: foundUser[0].username, id: foundUser[0].id})
+		// return user incl. jwt
+		res.status(200).json({success: true, data: 
+			{ username: foundUser[0].username, id: foundUser[0].id, jwt }
+			})
+	} catch (err) {res.status(404).json({ success: false, data: err })}	
 }
 
 // @ desc logout
-// @ route	POST /api/v1/auth/:id
+// @ route	POST /api/v1/auth/logout
 // @ access private
-const deleteUser= async(req, res) => {
+const logout= async(req, res) => {
 	res.send("logout")
 }
 
 module.exports = {
-	registerUser, updateUser, deleteUser
+	login, logout
 }

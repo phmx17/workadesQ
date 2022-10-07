@@ -11,13 +11,17 @@ const routes = [
     component: HomeView
   },
   {
-    path: '/finddesq',
-    name: 'findDesq',
+    path: '/home',
+    redirect: '/',
+  },
+  {
+    path: '/finddesk',
+    name: 'findDesk',
     component: () => import('../views/FindDesqView.vue') // lazy load
   },
   {
-    path: '/adddesq',
-    name: 'addDesq',
+    path: '/adddesk',
+    name: 'addDesk',
     component: () => import('../views/AddDesqView.vue') // lazy load
   },
   {
@@ -29,6 +33,11 @@ const routes = [
   path: '/user/register',
   name: 'userRegister',
   component: () => import('../views/user/RegisterUserView.vue') // lazy load
+  },
+  {
+  path: '/login',
+  name: 'login',
+  component: () => import('../views/user/LoginView.vue') // lazy load
   },
 
 ]

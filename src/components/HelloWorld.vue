@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row class="text-center">
-      <v-col cols="12">
+      <v-col cols="3">
         <v-img
           :src="require('../assets/logo.svg')"
           class="my-3"
@@ -12,12 +12,12 @@
 
       <v-col class="mb-4">
         <h1 class="display-2 font-weight-bold mb-3">
-          Welcome to Vuetify
+          workadesQ
         </h1>
 
         <p class="subheading font-weight-regular">
-          For help and collaboration with other Vuetify developers,
-          <br>please join our online
+          The best place to find a public location for a mobile work session
+          <br>please join
           <a
             href="https://community.vuetifyjs.com"
             target="_blank"
@@ -27,7 +27,7 @@
 
       <v-col
         class="mb-5"
-        cols="12"
+        cols="3"
       >
         <h2 class="headline font-weight-bold mb-3">
           What's next?
@@ -48,7 +48,7 @@
 
       <v-col
         class="mb-5"
-        cols="12"
+        cols="3"
       >
         <h2 class="headline font-weight-bold mb-3">
           Important Links
@@ -69,7 +69,7 @@
 
       <v-col
         class="mb-5"
-        cols="12"
+        cols="3"
       >
         <h2 class="headline font-weight-bold mb-3">
           Ecosystem

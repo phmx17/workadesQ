@@ -5,6 +5,7 @@ const cors = require('cors')
 // import routes
 const desksRouter = require('./routes/desks.js')
 const usersRouter = require('./routes/users.js')
+const authRouter = require('./routes/auth.js')
 
 // body parser
 const app = express()
@@ -18,6 +19,7 @@ require('./atlasDbConnect.js')
 // assign routes
 app.use('/api/v1/desks', desksRouter)
 app.use('/api/v1/users', usersRouter)
+app.use('/api/v1/auth', authRouter)
 
 
 // start server

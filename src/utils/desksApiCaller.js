@@ -13,7 +13,6 @@ export const desksApiCaller = async(method, data) => {
 				return 
 			} catch (err) { 
 				const errKeyValue = err.response.data.data.keyValue
-				console.log("err", errKeyValue )
 				if (errKeyValue) return "This location already exists"
 			}
 		

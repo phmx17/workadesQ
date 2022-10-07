@@ -9,6 +9,7 @@
   "author": "Percy Helsdon",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "ckey": "^1.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.0.2",

@@ -6,6 +6,7 @@ const User = require('../models/User.js')
 // @ access public
 const registerUser = async(req, res) => {
 	const newUser = req.body
+	newUser.password = await require('../utils/encrypt.js')(newUser.password) // custom util
 	try {
 		const createdUser = await User.create(newUser)	// only returns success, no error
 		const savedUser = await createdUser.save()
