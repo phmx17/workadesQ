@@ -19,8 +19,10 @@
             </ValidationObserver>
           </v-card>
           <v-col cols="12" class="text-center" >
-            <h2>User object</h2>
-            {{ getUser.userId }}
+            <h2>User object from store</h2>
+            id: {{ getUser.userId }} <br/>
+            username: {{ getUser.username }} <br/>
+            jwt: {{ getUser.jwToken }} <br/>
 
           </v-col>
       </v-row>
@@ -46,8 +48,8 @@ export default {
   },
   data() {
     return {
-      email: "",
-      password: "",
+      email: "atj@test.com",
+      password: "qwertz",
     }
   },
   methods: {
@@ -60,24 +62,21 @@ export default {
         }
         this.$refs.form.validate().then(async success => {
           if (!success) return
+          const user = await authApiCaller('post', data)
+            if (user.errMsg) {
+              this.$refs.form.setErrors({email: user.errMsg})
+              this.$refs.form.setErrors({password: user.errMsg})
+              return
+            }
+            // successful login; store user and jwt in vuex
+            this.$store.dispatch('addUserAction', user) // calling action is better than mutation  
+  
+            // this.$router.push('/finddesk');
         })
-        const credentials = await authApiCaller('post', data)
-          if (credentials.errMsg) {
-            this.$refs.form.setErrors({email: credentials.errMsg})
-            this.$refs.form.setErrors({password: credentials.errMsg})
-            return
-          }
-          // successful login
-          console.log("credentials: ", credentials)
-          // store user and jwt in vuex
-
-
-          this.$router.push('/finddesk');
     }
   },
 
-  computed: mapGetters(['getUser'])
-
+  computed: mapGetters(['getUser']), // using mapper
 }
 </script>
 
