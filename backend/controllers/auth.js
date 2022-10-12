@@ -18,9 +18,13 @@ const login = async(req, res) => {
 		// login success, sign jwt
 		const jwt = await signJwt({username: foundUser[0].username, id: foundUser[0].id})
 		// return user incl. jwt
-		res.status(200).json({success: true, data: 
+		res
+			.status(200)
+			.cookie('jwToken', jwt)
+			.json({success: true, data: 
 			{ username: foundUser[0].username, id: foundUser[0].id, jwt }
 			})
+			
 	} catch (err) {res.status(404).json({ success: false, data: err })}	
 }
 

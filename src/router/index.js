@@ -1,3 +1,4 @@
+import store from '@/store'
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import HomeView from '../views/HomeView.vue'
@@ -30,14 +31,28 @@ const routes = [
     component: () => import('../views/ValidateTests.vue') // lazy load
   },
   {
-  path: '/user/register',
-  name: 'userRegister',
-  component: () => import('../views/user/RegisterUserView.vue') // lazy load
+    path: '/user/register',
+    name: 'userRegister',
+    component: () => import('../views/user/RegisterUserView.vue') // lazy load
   },
   {
-  path: '/login',
-  name: 'login',
-  component: () => import('../views/user/LoginView.vue') // lazy load
+    path: '/login',
+    name: 'login',
+    component: () => import('../views/user/LoginView.vue') // lazy load
+  },
+  {
+    path: '/authtest',
+    name: 'authTest',  
+    component: () => import('../views/AuthTest.vue'), // lazy load
+    // route guard
+    beforeEnter: (to, from, next) => {
+      if (store.state.user.isAuthenticated == false) {
+        console.log("not allowed, redirected")
+        next('/login')
+      }
+      else {
+      } next()
+    }
   },
 
 ]

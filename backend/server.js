@@ -1,6 +1,7 @@
 const express = require('express')
 const dotenv = require('dotenv').config()
 const cors = require('cors')
+const cookieParser = require('cookie-parser')
 
 // import routes
 const desksRouter = require('./routes/desks.js')
@@ -12,6 +13,7 @@ const app = express()
 
 app.use(express.json()) 
 app.use(cors())
+app.use(cookieParser())
 
 // database connection
 require('./atlasDbConnect.js')

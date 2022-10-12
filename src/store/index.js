@@ -8,7 +8,8 @@ export default new Vuex.Store({
     user: {
       userId: "id test",
       username: "username test",
-      jwToken: "token test"
+      jwToken: "token test",
+      isAuthenticated: false
     },
   },
 
@@ -23,6 +24,7 @@ export default new Vuex.Store({
       state.user.userId = payload.id
       state.user.username = payload.username
       state.user.jwToken = payload.jwt
+      state.user.isAuthenticated = true
     }
   },
 

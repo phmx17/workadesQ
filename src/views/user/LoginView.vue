@@ -18,13 +18,6 @@
               </v-form>
             </ValidationObserver>
           </v-card>
-          <v-col cols="12" class="text-center" >
-            <h2>User object from store</h2>
-            id: {{ getUser.userId }} <br/>
-            username: {{ getUser.username }} <br/>
-            jwt: {{ getUser.jwToken }} <br/>
-
-          </v-col>
       </v-row>
     </v-container>
   </v-app>
@@ -41,7 +34,7 @@ extend('requiredPassword', {...required, message: "Password is required" })
 extend('email', {...email, message: "Incorrect email format" })
 
 import { authApiCaller } from '../../utils/authApiCaller.js' // custom api caller
-import { mapGetters } from 'vuex' 
+import { mapGetters, mapActions } from 'vuex' 
 export default {
   components: {
     ValidationProvider, ValidationObserver
@@ -53,6 +46,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['addUserAction']), // vuex mapper for actions
     async handleSubmitForm() {
         // insert spinner while api submits and checks for duplicate location
         // prepare data for shipment
@@ -62,7 +56,9 @@ export default {
         }
         this.$refs.form.validate().then(async success => {
           if (!success) return
-          const user = await authApiCaller('post', data)
+          const user = await authApiCaller('post', data) // call api
+          localStorage.setItem('anya', user.jwt) // better to local storage than cookie because cookie will get sent with EVERY request
+          // document.cookie = `${user.id}=${user.jwt}`
             if (user.errMsg) {
               this.$refs.form.setErrors({email: user.errMsg})
               this.$refs.form.setErrors({password: user.errMsg})
@@ -71,12 +67,14 @@ export default {
             // successful login; store user and jwt in vuex
             this.$store.dispatch('addUserAction', user) // calling action is better than mutation  
   
-            // this.$router.push('/finddesk');
+            this.$router.push('/authtest');
         })
     }
   },
 
-  computed: mapGetters(['getUser']), // using mapper
+  computed: {
+    ...mapGetters(['getUser']) // using vuex mapper for getters
+  }
 }
 </script>
 
