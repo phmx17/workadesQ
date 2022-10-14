@@ -6,7 +6,8 @@ export const authApiCaller = async(method, data) => {
 			const optionsPost = {
 				method: 'post',
 				url: "http://localhost:5000/api/v1/auth/login",
-				data        
+				data,
+				withCredentials: true,  // this enables cookie set in chrome; API will return Access-Control-Allow headers as middleware in server.js, otherwise no cookies!
 			}
 			try {            
 				const reply = await axios(optionsPost)			

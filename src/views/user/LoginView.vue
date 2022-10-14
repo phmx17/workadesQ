@@ -67,7 +67,7 @@ export default {
             // successful login; store user and jwt in vuex
             this.$store.dispatch('addUserAction', user) // calling action is better than mutation  
   
-            this.$router.push('/authtest');
+            this.$router.push('/home');
         })
     }
   },

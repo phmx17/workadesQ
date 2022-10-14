@@ -1,28 +1,48 @@
 <template>
   <v-app>
-    <div>
-      <div style="display: flex; align-items: center; justify-content: space-between" >
-        <h4>user: {{ center.lat }} | {{ center.lng }}</h4>
-        <h4>map: {{ mapCoordinates.lat }} | {{ mapCoordinates.lng }}</h4>
-      </div>
+    <v-container>
+      <v-row justify="center" >
+        <v-col cols="12">
+          <div>
+            <div style="display: flex; align-items: center; justify-content: space-between" >
+              <h4>user: {{ center.lat }} | {{ center.lng }}</h4>
+              <h4>map: {{ mapCoordinates.lat }} | {{ mapCoordinates.lng }}</h4>
+            </div>
 
-    </div>
-    <br>
-    <gmap-map
-      :center="center"
-      :zoom='12'
-      style="width:100%;  min-height: 600px;" 
-      ref="mapRef"
-      @dragend="handleDrag"
-      @click="handleAddMarker"
-    >
-      <gmap-marker
-        :key="index"
-        v-for="(m, index) in markers"
-        :position="m.position"
-        @click="center=m.position"
-      ></gmap-marker>
-    </gmap-map>
+          </div>
+          <br>
+          <gmap-map
+            :center="center"
+            :zoom='12'
+            style="width:100%;  min-height: 600px;" 
+            ref="mapRef"
+            @dragend="handleDrag"
+            @click="handleInfoWindowClose"
+            width="100vw"
+            >
+
+            <!-- info window -->
+            <gmap-info-window :options="infoWindowOptions" :position="infoWindowPosition" :opened="infoWindowOpened" @closeclick="handleInfoWindowClose">
+              <div class="infoWindow">
+                <h4>Le Cafe Du Internet</h4>
+                <p>Open: 9am-5pm</p>
+              </div>
+            </gmap-info-window>
+
+            <!-- marker -->
+            <gmap-marker
+              :key="index"
+              v-for="(m, index) in markers"
+              :position="m.position"
+              :draggable="false"
+              :clickable="true"
+              @click="handleMarkerClicked(m)"
+
+            ></gmap-marker>
+          </gmap-map>
+        </v-col>
+      </v-row>
+    </v-container>  
   </v-app>
 </template>
 
@@ -41,6 +61,11 @@ export default {
       boundsHiLat: 0,
       boundsLowLng: 0,
       boundsHiLng: 0,
+      // for info window
+      activeDesk: {},
+      infoWindowOptions: { pixelOffset: { width: 0, height: -35}},
+      infoWindowOpened: false,
+
     };
   },
 
@@ -50,7 +75,7 @@ export default {
     // populate map with markers
     const desks = await desksApiCaller('get')
     if (!desks.error) this.displayMarkers(desks) // get markers onto the map
-    else console.log("Error message inside vue: ", desks.error)
+    else console.log("Error message from mounted(): ", desks.error)
   },
 
   methods: {
@@ -111,15 +136,25 @@ export default {
       // this.boundsHiLng = bounds.Va.hi
     },
 
-    handleAddMarker() {
-      const lat = this.map.getCenter().lat()
-      const lng = this.map.getCenter().lng()
-      console.log(this.map)
+    // handleAddMarker() {
+    //   const lat = this.map.getCenter().lat()
+    //   const lng = this.map.getCenter().lng()
+    //   console.log(this.map)
      
-      const marker = {lat, lng}
-      this.markers.push({ position: marker });  
-      this.center = marker    
-    }
+    //   const marker = {lat, lng}
+    //   this.markers.push({ position: marker });  
+    //   this.center = marker    
+    // },
+
+    handleMarkerClicked(desk) {
+      this.activeDesk = desk
+      this.infoWindowOpened = true
+    },
+
+    handleInfoWindowClose() {
+      this.activeDesk = {}
+      this.infoWindowOpened = false
+    },
  
   },
   computed: {
@@ -128,6 +163,12 @@ export default {
       return {
         lat: this.map.getCenter().lat().toFixed(4), 
         lng: this.map.getCenter().lng().toFixed(4)
+      }
+    },
+    infoWindowPosition() {
+      return {
+        lat: parseFloat(this.activeDesk.lat),
+        lng: parseFloat(this.activeDesk.lng)
       }
     }
   }

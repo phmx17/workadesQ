@@ -12,7 +12,16 @@ const authRouter = require('./routes/auth.js')
 const app = express()
 
 app.use(express.json()) 
-app.use(cors())
+// app.use(cors())
+// app.options('*', cors()) // allow preflight
+app.use((req, res, next) => {
+	res.header({
+		'Access-Control-Allow-Origin': 'http://localhost:8080',
+		'Access-Control-Allow-Credentials': 'true',
+		"Access-Control-Allow-Headers": "Content-Type"
+	})
+	next()
+})
 app.use(cookieParser())
 
 // database connection

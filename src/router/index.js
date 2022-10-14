@@ -40,19 +40,12 @@ const routes = [
     name: 'login',
     component: () => import('../views/user/LoginView.vue') // lazy load
   },
+
   {
-    path: '/authtest',
-    name: 'authTest',  
-    component: () => import('../views/AuthTest.vue'), // lazy load
-    // route guard
-    beforeEnter: (to, from, next) => {
-      if (store.state.user.isAuthenticated == false) {
-        console.log("not allowed, redirected")
-        next('/login')
-      }
-      else {
-      } next()
-    }
+    // create page not found
+    path: '/:pathMatch(.*)*',
+    name: '404notFound',  
+    component: () => import('../views/404notFoundView.vue'), // lazy load
   },
 
 ]

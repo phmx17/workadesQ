@@ -21,7 +21,7 @@
           <a
             href="https://community.vuetifyjs.com"
             target="_blank"
-          >Discord Community</a>
+          >workadesQ Community</a>
         </p>
       </v-col>
 
