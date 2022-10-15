@@ -1,31 +1,31 @@
 <template>
   <v-app>
-    <v-container>
-      <v-row justify="center" >
+    <v-container class="container" >
+      <v-row justify="center">
         <v-col cols="12">
-          <div>
+          <div class="container">
+       
             <div style="display: flex; align-items: center; justify-content: space-between" >
               <h4>user: {{ center.lat }} | {{ center.lng }}</h4>
               <h4>map: {{ mapCoordinates.lat }} | {{ mapCoordinates.lng }}</h4>
             </div>
 
-          </div>
+   
           <br>
           <gmap-map
             :center="center"
             :zoom='12'
-            style="width:100%;  min-height: 600px;" 
+            style="width:100%; height: 600px;" 
             ref="mapRef"
             @dragend="handleDrag"
             @click="handleInfoWindowClose"
-            width="100vw"
-            >
 
+          >
             <!-- info window -->
             <gmap-info-window :options="infoWindowOptions" :position="infoWindowPosition" :opened="infoWindowOpened" @closeclick="handleInfoWindowClose">
               <div class="infoWindow">
-                <h4>Le Cafe Du Internet</h4>
-                <p>Open: 9am-5pm</p>
+                <h4>{{ activeDesk.name }}</h4>
+                <p>Open: {{ activeDesk.weekdayHours[0] }} to {{ activeDesk.weekdayHours[1] }}</p>
               </div>
             </gmap-info-window>
 
@@ -36,10 +36,11 @@
               :position="m.position"
               :draggable="false"
               :clickable="true"
-              @click="handleMarkerClicked(m)"
+              @click="handleMarkerClicked(index)"
 
             ></gmap-marker>
           </gmap-map>
+          </div>
         </v-col>
       </v-row>
     </v-container>  
@@ -47,7 +48,9 @@
 </template>
 
 <script>
-import { desksApiCaller } from '../utils/desksApiCaller.js'
+import { desksApiCaller } from '../utils/desksApiCaller.js' // custom api caller
+import { mapGetters } from 'vuex' 
+
 export default { 
   data() {
     return {      
@@ -62,7 +65,12 @@ export default {
       boundsLowLng: 0,
       boundsHiLng: 0,
       // for info window
-      activeDesk: {},
+      activeDesk: {
+        location: {
+          coordinates: [0, 0]
+        },
+        weekdayHours: [0, 0]
+      },
       infoWindowOptions: { pixelOffset: { width: 0, height: -35}},
       infoWindowOpened: false,
 
@@ -74,11 +82,18 @@ export default {
     this.$refs.mapRef.$mapPromise.then(map => this.map = map)
     // populate map with markers
     const desks = await desksApiCaller('get')
-    if (!desks.error) this.displayMarkers(desks) // get markers onto the map
-    else console.log("Error message from mounted(): ", desks.error)
+    if (!desks.error) {
+      this.displayMarkers(desks) // get markers onto the map
+      this.storeDesks(desks) // save to vuex
+    }
+    else console.log("Error api call at mounted(): ", desks.error)
   },
 
   methods: {
+    storeDesks(desks) {
+      this.$store.dispatch('addDesksAction', desks) // calling action in vuex
+    },
+
     displayMarkers(desks) {
       // update markers list for showing on map
       desks.forEach(desk => {
@@ -92,19 +107,19 @@ export default {
     setPlace(place) {
       this.currentPlace = place;
     },
-
-    addMarker() {
-      if (this.currentPlace) {
-        const marker = {
-          lat: this.currentPlace.geometry.location.lat(),
-          lng: this.currentPlace.geometry.location.lng()
-        };
-        this.markers.push({ position: marker });
-        this.places.push(this.currentPlace);
-        this.center = marker;
-        this.currentPlace = null;
-      }
-    },
+    // not needed....
+    // addMarker() {
+    //   if (this.currentPlace) {
+    //     const marker = {
+    //       lat: this.currentPlace.geometry.location.lat(),
+    //       lng: this.currentPlace.geometry.location.lng()
+    //     };
+    //     this.markers.push({ position: marker });
+    //     this.places.push(this.currentPlace);
+    //     this.center = marker;
+    //     this.currentPlace = null;
+    //   }
+    // },
 
     geolocate() {
       const options = {enableHighAccuracy: true}
@@ -146,13 +161,12 @@ export default {
     //   this.center = marker    
     // },
 
-    handleMarkerClicked(desk) {
-      this.activeDesk = desk
+    handleMarkerClicked(index) {
+      this.activeDesk = this.getDesks[index]
       this.infoWindowOpened = true
     },
 
     handleInfoWindowClose() {
-      this.activeDesk = {}
       this.infoWindowOpened = false
     },
  
@@ -166,12 +180,32 @@ export default {
       }
     },
     infoWindowPosition() {
+      console.log("active info desk lng:" , this.activeDesk.location.coordinates[1])
       return {
-        lat: parseFloat(this.activeDesk.lat),
-        lng: parseFloat(this.activeDesk.lng)
+        lat: parseFloat(this.activeDesk.location.coordinates[0]),
+        lng: parseFloat(this.activeDesk.location.coordinates[1])
       }
-    }
+    },
+
+    ...mapGetters(['getDesks']) // using vuex mapper for getters
   }
 }
 
 </script>
+
+<style scoped>
+.container {
+  height: 80vh;
+  width: 100vw;
+}
+.row {
+  position: absolute;
+  height: 80vh;
+  width: 100vw;   
+}
+.col {
+  position: absolute;
+  height: 80vh;
+  width: 100vw;   
+}
+</style>

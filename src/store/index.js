@@ -11,11 +11,17 @@ export default new Vuex.Store({
       jwToken: "token test",
       isAuthenticated: false
     },
+
+    desks: []
   },
 
   getters: {
     getUser(state) {
       return state.user    
+    },
+
+    getDesks(state) {
+      return state.desks
     }
   },
 
@@ -25,14 +31,20 @@ export default new Vuex.Store({
       state.user.username = payload.username
       state.user.jwToken = payload.jwt
       state.user.isAuthenticated = true
+    },
+
+    addDesksToState(state, payload) {
+      state.desks = [...payload]
     }
   },
 
   actions: {
-    addUserAction(context, payload ) {
+    addUserAction(context, payload) {
       context.commit('addUserToState', payload)
+    },
+    addDesksAction(context, payload) {
+      context.commit('addDesksToState', payload)
     }
-    // addUserAction: ({ commit, payload }) => commit('addUserToState', {userId: payload.user.userId})
   },
 
   modules: {

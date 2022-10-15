@@ -34,7 +34,7 @@ extend('requiredPassword', {...required, message: "Password is required" })
 extend('email', {...email, message: "Incorrect email format" })
 
 import { authApiCaller } from '../../utils/authApiCaller.js' // custom api caller
-import { mapGetters, mapActions } from 'vuex' 
+import { mapGetters } from 'vuex' 
 export default {
   components: {
     ValidationProvider, ValidationObserver
