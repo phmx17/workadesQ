@@ -22,6 +22,8 @@ const deskSchema = new mongoose.Schema({
     desk: Boolean, wifi: Boolean, power: Boolean, coffee: Boolean, wc: Boolean
   },
 
+  rating: Number,
+  
   daysClosed: [
   	{day: { type: String }, closed: {type: Boolean}}
   ],

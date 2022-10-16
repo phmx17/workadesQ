@@ -1,9 +1,9 @@
 <template>
   <v-app>
-    <v-container class="container" >
+    <v-container>
       <v-row justify="center">
-        <v-col cols="12">
-          <div class="container">
+        <v-col cols="12" class="col" >
+          <!-- <div class="container"> -->
        
             <div style="display: flex; align-items: center; justify-content: space-between" >
               <h4>user: {{ center.lat }} | {{ center.lng }}</h4>
@@ -25,7 +25,28 @@
             <gmap-info-window :options="infoWindowOptions" :position="infoWindowPosition" :opened="infoWindowOpened" @closeclick="handleInfoWindowClose">
               <div class="infoWindow">
                 <h4>{{ activeDesk.name }}</h4>
-                <p>Open: {{ activeDesk.weekdayHours[0] }} to {{ activeDesk.weekdayHours[1] }}</p>
+                <h5>Weekdays: {{ activeDesk.weekdayHours[0] }} to {{ activeDesk.weekdayHours[1] }}</h5>
+                <h5>Weekends: {{ activeDesk.weekendHours[0] }} to {{ activeDesk.weekendHours[1] }}</h5>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top 5px" >
+                  <v-icon small :color="activeDesk.features.desk ? 'teal' : 'grey lighten-1'">mdi-desk</v-icon>
+                  <v-icon small :color="activeDesk.features.wifi ? 'teal' : 'grey lighten-1'">mdi-wifi</v-icon>
+                  <v-icon small :color="activeDesk.features.power ? 'teal' : 'grey lighten-1'">mdi-power-plug</v-icon>
+                  <v-icon small :color="activeDesk.features.coffee ? 'teal' : 'grey lighten-1'">mdi-coffee</v-icon>
+                  <v-icon small :color="activeDesk.features.wc ? 'teal' : 'grey lighten-1'">mdi-human-male-female</v-icon>
+                </div>
+                <h5 style="display: inline;">Closed: </h5>
+                <div v-for="day in activeDesk.daysClosed" style="display: inline;" >
+                  <h5 v-if="day.closed" style="display: inline;" >{{ day.day }} </h5>
+                </div>
+                <h5><v-rating :value="activeDesk.rating" color="orange" background-color="orange" size="20"></v-rating></h5>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top 5px" >
+                  <v-btn v-if="!getUser.isCheckedIn" @click="handleCheckin" color="teal white..text" block elevation="4" class="my-2" >Checkin</v-btn>
+                  <v-btn v-if="getUser.isCheckedIn" @click="handleCheckout" color="red white..text" block elevation="4" class="my-2" >Checkout</v-btn>
+                </div>
+                <h5>Checked In:</h5>
+                <h5 v-if="getUser.isCheckedIn" >{{ getUser.username }}</h5>
+
+
               </div>
             </gmap-info-window>
 
@@ -40,7 +61,7 @@
 
             ></gmap-marker>
           </gmap-map>
-          </div>
+          <!-- </div> -->
         </v-col>
       </v-row>
     </v-container>  
@@ -49,6 +70,7 @@
 
 <script>
 import { desksApiCaller } from '../utils/desksApiCaller.js' // custom api caller
+import { checkinApiCaller } from '../utils/checkinApiCaller.js' // custom api caller
 import { mapGetters } from 'vuex' 
 
 export default { 
@@ -69,7 +91,11 @@ export default {
         location: {
           coordinates: [0, 0]
         },
-        weekdayHours: [0, 0]
+        weekdayHours: [0, 0],
+        weekendHours: [0, 0],
+        features: { wifi: false },
+        daysClosed: [{ mon: true }],
+        rating: 0
       },
       infoWindowOptions: { pixelOffset: { width: 0, height: -35}},
       infoWindowOpened: false,
@@ -169,6 +195,30 @@ export default {
     handleInfoWindowClose() {
       this.infoWindowOpened = false
     },
+
+    async handleCheckin() {
+      const userId = this.$store.getters['getUser'].userId
+      if (!userId) return this.$router.push('/login') // redirect to login if no user id in vuex store
+    
+      const data = {
+        deskId: this.activeDesk._id,
+        userId
+      }
+      const reply = await checkinApiCaller('checkin', data) // call api to checkin user at desk
+      if (reply.err) {
+        console.log("sum tin wong", err)
+        return
+      } 
+
+      this.$store.commit('userCheckInOut', true)
+    },
+
+    async handleCheckout() {
+      const userId = this.$store.getters['getUser'].userId    
+      const data = { userId }
+      await checkinApiCaller('checkout', data) // call api to checkout
+      this.$store.commit('userCheckInOut', false)
+    }
  
   },
   computed: {
@@ -180,14 +230,13 @@ export default {
       }
     },
     infoWindowPosition() {
-      console.log("active info desk lng:" , this.activeDesk.location.coordinates[1])
       return {
         lat: parseFloat(this.activeDesk.location.coordinates[0]),
         lng: parseFloat(this.activeDesk.location.coordinates[1])
       }
     },
 
-    ...mapGetters(['getDesks']) // using vuex mapper for getters
+    ...mapGetters(['getDesks', 'getUser']) // using vuex mapper for getters
   }
 }
 
@@ -195,7 +244,7 @@ export default {
 
 <style scoped>
 .container {
-  height: 80vh;
+  height: 100vh;
   width: 100vw;
 }
 .row {
@@ -206,6 +255,6 @@ export default {
 .col {
   position: absolute;
   height: 80vh;
-  width: 100vw;   
+  /* width: 100vw;    */
 }
 </style>

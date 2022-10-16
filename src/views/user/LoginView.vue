@@ -34,7 +34,7 @@ extend('requiredPassword', {...required, message: "Password is required" })
 extend('email', {...email, message: "Incorrect email format" })
 
 import { authApiCaller } from '../../utils/authApiCaller.js' // custom api caller
-import { mapGetters } from 'vuex' 
+import { mapGetters, mapActions } from 'vuex' 
 export default {
   components: {
     ValidationProvider, ValidationObserver
@@ -46,7 +46,6 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['addUserAction']), // vuex mapper for actions
     async handleSubmitForm() {
         // insert spinner while api submits and checks for duplicate location
         // prepare data for shipment
@@ -60,21 +59,20 @@ export default {
           localStorage.setItem('anya', user.jwt) // better to local storage than cookie because cookie will get sent with EVERY request
           // document.cookie = `${user.id}=${user.jwt}`
             if (user.errMsg) {
-              this.$refs.form.setErrors({email: user.errMsg})
+              this.$refs.form.setErrors({email: user.errMsg}) // set validation errors
               this.$refs.form.setErrors({password: user.errMsg})
               return
             }
             // successful login; store user and jwt in vuex
             this.$store.dispatch('addUserAction', user) // calling action is better than mutation  
   
-            this.$router.push('/home');
+            // this.$router.push('/home');
+            this.$router.go(-1)
         })
     }
   },
 
-  computed: {
-    ...mapGetters(['getUser']) // using vuex mapper for getters
-  }
+
 }
 </script>
 

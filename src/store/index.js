@@ -6,10 +6,11 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     user: {
-      userId: "id test",
-      username: "username test",
-      jwToken: "token test",
-      isAuthenticated: false
+      userId: null,
+      username: null,
+      jwToken: null,
+      isAuthenticated: false,
+      isCheckedIn: false
     },
 
     desks: []
@@ -33,6 +34,10 @@ export default new Vuex.Store({
       state.user.isAuthenticated = true
     },
 
+    userCheckInOut(state, payload) {
+      state.user.isCheckedIn = payload
+    },    
+
     addDesksToState(state, payload) {
       state.desks = [...payload]
     }
@@ -42,9 +47,13 @@ export default new Vuex.Store({
     addUserAction(context, payload) {
       context.commit('addUserToState', payload)
     },
+
     addDesksAction(context, payload) {
       context.commit('addDesksToState', payload)
-    }
+    },
+
+    
+
   },
 
   modules: {
